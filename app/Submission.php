@@ -15,7 +15,7 @@ class Submission extends Model
     public const STATUS_COMPLETED = 'SELESAI';
     public const STATUS_REJECTED = 'DITOLAK';
 
-//    protected $dates = ['approved_at', 'rejected_at'];
+    protected $dates = ['approved_at', 'rejected_at', 'processed_at'];
 
     public function user(){
         return $this->belongsTo(User::class, 'user_id');

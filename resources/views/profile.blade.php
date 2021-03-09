@@ -30,10 +30,12 @@
                                     <input type="text" name="email" id="email" class="form-control" value="{{ old( 'email', $user->email) }}" readonly>
                                 </div>
 
+                                @hasanyrole('admin|verifikator')
                                 <div class="form-group">
-                                    <label for="role">Role</label>
+                                    <label for="role">Role {{$user->roles->join(', ')}}</label>
                                     <input type="text" name="role" id="role" class="form-control" value="{{ old( 'role', $user->role) }}" readonly>
                                 </div>
+                                @endhasanyrole
 
                                 <div class="form-group">
                                     <label for="password">Password</label>

@@ -22,24 +22,25 @@
                                 <small class="text-white">{{$submission->created_at}}</small>
                             </div>
                         </div>
-{{--                        @if--}}
-                        <div class="wizard-step wizard-step-{{$submission->rejected_at === null && $submission->status === \App\Submission::STATUS_REJECTED ? 'danger' : 'active'}}">
+                        @if($submission->status !== \App\Submission::STATUS_REJECTED)
+                        <div class="wizard-step wizard-step-{{$submission->status === \App\Submission::STATUS_PROCESSING || $submission->status === \App\Submission::STATUS_COMPLETED ? 'active' : ''}}">
                             <div class="wizard-step-icon">
-                                <i class="fas fa-{{$submission->rejected_at === null && $submission->status === \App\Submission::STATUS_REJECTED ? 'times' : 'stopwatch'}}"></i>
+                                <i class="fas fa-stopwatch"></i>
                             </div>
                             <div class="wizard-step-label">
-                                Pengajuan {{ $submission->rejected_at === null && $submission->status === \App\Submission::STATUS_REJECTED ? 'Ditolak' : 'Diproses'}} <br>
-                                <small class="text-white"> {{ $submission->rejected_at === null && $submission->status === \App\Submission::STATUS_REJECTED ? $submission->rejected_at : $submission->processed_at }}</small>
+                                Pengajuan {{$submission->status === \App\Submission::STATUS_PENDING ? 'Belum' : 'Telah'}} Diproses <br>
+                                <small class="text-white"> {{$submission->processed_at}}</small>
                             </div>
                         </div>
-                        <div class="wizard-step {{$submission->status === \App\Submission::STATUS_COMPLETED ? 'wizard-step-success' : ''}}">
+                        @endif
+                        <div class="wizard-step {{$submission->status === \App\Submission::STATUS_COMPLETED ? 'wizard-step-success' : ($submission->status === \App\Submission::STATUS_REJECTED ? 'wizard-step-danger' : '')}}">
                             <div class="wizard-step-icon">
-                                <i class="fas fa-{{$submission->status === \App\Submission::STATUS_COMPLETED ? 'check' : 'stopwatch'}}"></i>
+                                <i class="fas fa-{{$submission->status === \App\Submission::STATUS_COMPLETED ? 'check' : ($submission->status === \App\Submission::STATUS_PENDING ? 'stopwatch' : 'times')}}"></i>
                             </div>
                             <div class="wizard-step-label">
-                                Pengajuan Selesai <br>
-                                @if($submission->status === \App\Submission::STATUS_COMPLETED)
-                                    <small>{{$submission->approved_at}}</small>
+                                Pengajuan {{$submission->status === \App\Submission::STATUS_COMPLETED ? 'Telah Selesai' : ($submission->status === \App\Submission::STATUS_REJECTED ? 'Di Tolak' : ' Belum Selesai')}} <br>
+                                @if($submission->status === \App\Submission::STATUS_COMPLETED || $submission->status === \App\Submission::STATUS_REJECTED)
+                                    <small>{{ $submission->status === \App\Submission::STATUS_COMPLETED ? $submission->approved_at : $submission->rejected_at }}</small>
                                 @endif
                             </div>
                         </div>

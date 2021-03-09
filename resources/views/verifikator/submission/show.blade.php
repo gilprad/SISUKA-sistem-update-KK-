@@ -1,55 +1,46 @@
 @extends('layouts.master')
 
-@section('title', 'Detail Submission')
+@section('title', 'Detail Pengajuan')
 
 @section('content')
     <section class="section">
         <div class="section-header">
-            <h1>Detail Submission</h1>
+            <h1>Detail pengajuan</h1>
         </div>
 
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
-                    @include('partials.alerts')
+                    @include('partials.alerts.alerts')
                     <div class="wizard-steps">
                         <div class="wizard-step wizard-step-active">
                             <div class="wizard-step-icon">
-                                <i class="fas fa-coffee"></i>
+                                <i class="fas fa-info"></i>
                             </div>
                             <div class="wizard-step-label">
-                                Customer Memesan <br>
-                                <small class="text-white">{{$order->created_at}}</small>
+                                Pengajuan Dibuat <br>
+                                <small class="text-white">{{$submission->created_at}}</small>
                             </div>
                         </div>
-                        <div class="wizard-step wizard-step-{{$order->confirmed_at === null ? 'warning' : 'active'}}">
+                        @if($submission->status !== \App\Submission::STATUS_REJECTED)
+                        <div class="wizard-step wizard-step-{{$submission->status === \App\Submission::STATUS_PROCESSING || $submission->status === \App\Submission::STATUS_COMPLETED ? 'active' : ''}}">
                             <div class="wizard-step-icon">
-                                <i class="fas fa-{{$order->confirmed_at === null ? 'stopwatch' : 'money-bill-wave'}}"></i>
+                                <i class="fas fa-stopwatch"></i>
                             </div>
                             <div class="wizard-step-label">
-                                Pembayaran Terkonfirmasi <br>
-                                <small>{{$order->confirmed_at}}</small>
+                                Pengajuan {{$submission->status === \App\Submission::STATUS_PENDING ? 'Belum' : 'Telah'}} Diproses <br>
+                                <small class="text-white"> {{$submission->processed_at}}</small>
                             </div>
                         </div>
-                        <div class="wizard-step {{$order->status === \App\Models\Order::STATUS_ON_DELIVERY || $order->shipping->status === \App\Models\Shipping::STATUS_SHIPPED ? 'wizard-step-active' : ''}}">
+                        @endif
+                        <div class="wizard-step {{$submission->status === \App\Submission::STATUS_COMPLETED ? 'wizard-step-success' : ($submission->status === \App\Submission::STATUS_REJECTED ? 'wizard-step-danger' : '')}}">
                             <div class="wizard-step-icon">
-                                <i class="fas fa-shipping-fast"></i>
+                                <i class="fas fa-{{$submission->status === \App\Submission::STATUS_COMPLETED ? 'check' : ($submission->status === \App\Submission::STATUS_PENDING ? 'stopwatch' : 'times')}}"></i>
                             </div>
                             <div class="wizard-step-label">
-                                Pesanan Terkirim <br>
-                                @if ($order->status === \App\Models\Order::STATUS_ON_DELIVERY || $order->shipping->status === \App\Models\Shipping::STATUS_SHIPPED)
-                                    <small>{{$order->shipping->updated_at}}</small>
-                                @endif
-                            </div>
-                        </div>
-                        <div class="wizard-step {{$order->status === \App\Models\Order::STATUS_COMPLETED ? 'wizard-step-success' : ''}}">
-                            <div class="wizard-step-icon">
-                                <i class="fas fa-{{$order->status === \App\Models\Order::STATUS_COMPLETED ? 'check' : 'stopwatch'}}"></i>
-                            </div>
-                            <div class="wizard-step-label">
-                                Pesanan Selesai <br>
-                                @if($order->status === \App\Models\Order::STATUS_COMPLETED)
-                                    <small>{{$order->updated_at}}</small>
+                                Pengajuan {{$submission->status === \App\Submission::STATUS_COMPLETED ? 'Telah Selesai' : ($submission->status === \App\Submission::STATUS_REJECTED ? 'Di Tolak' : ' Belum Selesai')}} <br>
+                                @if($submission->status === \App\Submission::STATUS_COMPLETED || $submission->status === \App\Submission::STATUS_REJECTED)
+                                    <small>{{ $submission->status === \App\Submission::STATUS_COMPLETED ? $submission->approved_at : $submission->rejected_at }}</small>
                                 @endif
                             </div>
                         </div>
@@ -59,81 +50,93 @@
         </div>
     </section>
 
-    <div class="section-body">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>Submission id: {{$submission->id}}</h4>
-                    </div>
-                    <div class="card-body">
-                        @include('partials.alerts.alerts')
-                        <form action="{{ route('admin.proposals.update', $submission->id) }}" method="POST">
-                            @method('PUT')
-                            @csrf
-                            <div class="form-group">
-                                <label for="user">User</label>
-                                <input type="text" name="name" id="name" class="form-control" value="{{ $submission->user->name }}" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="name">Email</label>
-                                <input type="email" name="email" id="email" class="form-control" value="{{ old('email', $user->email) }}" readonly>
-                            </div>
-
-                            <div class="form-group">
-                                <label for="description">Reason</label>
-                                <textarea name="description" id="description" rows="10" class="form-control" style="height: 80px" readonly>{{ old('reason', $submission->reason) }}</textarea>
-                            </div>
-
-                            <div class="card">
-                                <div class="card-header">
-                                    <h4>KTP, KK, Surat Pengantar Desa</h4>
+        <div class="section-body">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h4>ID Pengajuan: {{$submission->id}}</h4>
+                        </div>
+                        <div class="card-body">
+                            <form action="{{ route('verifikator.submission.update', $submission->id) }}" method="POST" enctype="multipart/form-data">
+                                @method('PUT')
+                                @csrf
+                                <div class="form-group">
+                                    <label for="user">ID User</label>
+                                    <input type="text" name="name" id="name" class="form-control" value="{{ $submission->user->id }}" readonly>
                                 </div>
-                                <div class="card-body">
-                                    @if($submission->foto_ktp)
-                                        <div class="text-center">
-                                            <img src="{{$submission->ktp_url}}" alt="{{$ktp->name}}'s logo" style="width: 300px; height: 300px">
-                                            <small class="text-muted">Foto KTP</small>
-                                        </div>
-                                    @endif
-                                    <hr>
-                                    @if($submission->foto_kk)
-                                        <div class="text-center">
-                                            <img src="{{$submission->kk_url}}" style="width: 150px; height: 150px">
-                                            <small class="text-muted">Foto KK</small>
-                                        </div>
-                                    @endif
-                                    <hr>
-                                    @if($submission->foto_surat_pengantar)
-                                        <div class="text-center">
-                                            <img src="{{$submission->surat_pengantar_url}}" style="width: 150px; height: 150px">
-                                            <small class="text-muted">Foto Surat Pengantar Desa</small>
-                                        </div>
-                                    @endif
+
+                                <div class="form-group">
+                                    <label for="name">Email User</label>
+                                    <input type="email" name="email" id="email" class="form-control" value="{{ old('email', $submission->user->email) }}" readonly>
                                 </div>
-                            </div>
 
-                            <div class="form-group">
-                                <label for="reject_reason">Reject reason (pesan apabila ditolak)</label>
-                                <textarea name="reject_reason" id="reject_reason" style="height: 50px" class="form-control">{{ old('reject_reason', $submission->reject_reason) }}</textarea>
-                            </div>
+                                <div class="form-group">
+                                    <label for="description">Alasan pengajuan</label>
+                                    <textarea name="description" id="description" rows="10" class="form-control" style="height: 80px" readonly>{{ old('reason', $submission->reason) }}</textarea>
+                                </div>
 
-                            <div class="form-group">
-                                <label for="action">Aksi</label>
-                                <select name="action" id="action" class="form-control">
-                                    <option value="-1">Pilih aksi</option>
-                                    <option value="accept" {{$submission->processed_at ? 'selected' : ''}}>Proses</option>
-                                    <option value="reject" {{$submission->rejected_at ? 'selected' : ''}}>Tolak</option>
-                                </select>
-                            </div>
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>KTP, KK, Surat Pengantar Desa</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        @if($submission->attachment->foto_ktp)
+                                            <div class="text-center">
+                                                <img src="{{ Storage::url($submission->attachment->foto_ktp) }}" style="width: 300px; height: 300px">
+                                                <small class="text-muted">Foto KTP</small>
+                                            </div>
+                                        @endif
+                                        <hr>
+                                        @if($submission->attachment->foto_kk)
+                                            <div class="text-center">
+                                                <img src="{{ Storage::url($submission->attachment->foto_kk) }}" style="width: 150px; height: 150px">
+                                                <small class="text-muted">Foto KK</small>
+                                            </div>
+                                        @endif
+                                        <hr>
+                                            @if($submission->attachment->foto_surat_pengantar)
+                                                <div class="text-center">
+                                                    <img src="{{ Storage::url($submission->attachment->foto_surat_pengantar) }}" style="width: 150px; height: 150px">
+                                                    <small class="text-muted">Foto Surat Pengantar Desa</small>
+                                                </div>
+                                            @endif
+                                    </div>
+                                </div>
 
-                            <input type="submit" class="btn btn-md btn-primary" value="Simpan">
-                        </form>
+                                @if($submission->status == \App\Submission::STATUS_PENDING)
+                                <div class="form-group">
+                                    <label for="reject_reason">Alasan ditolak (pesan apabila ditolak)</label>
+                                    <textarea name="reject_reason" id="reject_reason" style="height: 50px" class="form-control">{{ old('reject_reason', $submission->reject_reason) }}</textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="action">Aksi</label>
+                                    <select name="action" id="action" class="form-control">
+                                        <option value="">Pilih aksi</option>
+                                        <option value="accept" {{$submission->processed_at ? 'selected' : ''}}>Proses</option>
+                                        <option value="reject" {{$submission->rejected_at ? 'selected' : ''}}>Tolak</option>
+                                    </select>
+                                </div>
+
+                                    <input type="submit" class="btn btn-md btn-primary" value="Simpan">
+                                @endif
+
+                                @if($submission->status == \App\Submission::STATUS_PROCESSING)
+                                    <div class="form-group">
+                                        <label for="foto_kk_baru">Foto KK Baru</label>
+                                        <input type="file" name="foto_kk_baru" id="foto_kk_baru" accept="application/pdf" class="form-control" value="{{ old('foto_kk') }}" required>
+                                        <small class="form-text text-muted">*KK baru. Dengan mengunggah file KK Baru, maka status pengajuan dirubah menjadi SELESAI.</small>
+                                    </div>
+
+                                    <input type="submit" class="btn btn-md btn-primary" value="Simpan">
+                                @endif
+
+                            </form>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     </section>
 @endsection
