@@ -15,7 +15,7 @@
         <a href="{{ route($dashboardRoute) }}" class="mb-2">{{ config('app.name') }}</a>
     </div>
     <div class="sidebar-brand sidebar-brand-sm">
-        <a href="{{ route($dashboardRoute) }}">DCT</a>
+        <a href="{{ route($dashboardRoute) }}">SUK</a>
     </div>
     <ul class="sidebar-menu">
         <li class="menu-header">Dashboard</li>

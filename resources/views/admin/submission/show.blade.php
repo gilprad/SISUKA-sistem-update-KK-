@@ -7,7 +7,6 @@
         <div class="section-header">
             <h1>Detail pengajuan</h1>
         </div>
-
         <div class="section-body">
             <div class="row">
                 <div class="col-12">
@@ -44,7 +43,6 @@
                                 @endif
                             </div>
                         </div>
-{{--                            @endif--}}
                     </div>
                 </div>
             </div>

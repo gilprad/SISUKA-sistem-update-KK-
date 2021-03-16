@@ -47,6 +47,6 @@ Route::group(['middleware' => 'auth'], function(){
         Route::get('dashboard', 'DashboardController@index')->name('dashboard');
 
 //        MAKE SUBMISSION
-        Route::resource('submission', 'SubmissionController')->except(['edit', 'destroy']);
+        Route::resource('submission', 'SubmissionController')->except(['edit', 'destroy', 'update']);
     });
 });

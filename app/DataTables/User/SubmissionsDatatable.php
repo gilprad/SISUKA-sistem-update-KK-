@@ -20,8 +20,10 @@ class SubmissionsDatatable extends DataTable
     public function dataTable($query)
     {
         return datatables()
-            ->eloquent($query);
-//            ->addColumn('action', 'submissionsdatatable.action');
+            ->eloquent($query)
+            ->addColumn('action', function ($submission){
+                return '<a href="'. route('user.submission.show', $submission->id). '" class="btn btn-md btn-outline-primary" title="Detail Pengajuan"><i class="fa fa-eye"></i></a>';
+            });
     }
 
     /**
@@ -62,11 +64,11 @@ class SubmissionsDatatable extends DataTable
     protected function getColumns()
     {
         return [
-//            Column::computed('action')
-//                  ->exportable(false)
-//                  ->printable(false)
-//                  ->width(60)
-//                  ->addClass('text-center'),
+            Column::computed('action')
+                  ->exportable(false)
+                  ->printable(false)
+                  ->width(60)
+                  ->addClass('text-center'),
 //            Column::make('id'),
             Column::make('status'),
             Column::make('created_at'),

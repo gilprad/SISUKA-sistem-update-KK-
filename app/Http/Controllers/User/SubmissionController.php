@@ -32,6 +32,17 @@ class SubmissionController extends Controller
     }
 
     /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Submission $submission)
+    {
+        return view('user.submission.show', compact('submission'));
+    }
+
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -40,8 +51,10 @@ class SubmissionController extends Controller
     public function store(Request $request)
     {
         if (
-            Submission::where('status', Submission::STATUS_PENDING)
-                ->Orwhere('status', Submission::STATUS_PROCESSING)
+            Submission::where(function ($query) {
+                $query->where('status', Submission::STATUS_PENDING)
+                    ->orWhere('status', Submission::STATUS_PROCESSING);
+            })
                 ->where('user_id', auth()->id())->count() > 0
         )
         {

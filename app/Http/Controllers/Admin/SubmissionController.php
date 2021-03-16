@@ -30,7 +30,6 @@ class SubmissionController extends Controller
      */
     public function show(Submission $submission)
     {
-
         return view('admin.submission.show', compact('submission'));
     }
 
@@ -89,7 +88,6 @@ class SubmissionController extends Controller
         ]);
 
         $submission->user->notify(new KKApprovedNotification($submission));
-//        SendApprovedKartuKeluarga::dispatchNow($submission);
 
         return redirect()->back()->withSuccess('Email yang berisi KK baru telah dikirim ke pengguna');
     }
